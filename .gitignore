@@ -4,5 +4,5 @@ migrations/
 migrations
 media/
 .env
-araile/settings.py
+# araile/settings.py
 __pycache__/
