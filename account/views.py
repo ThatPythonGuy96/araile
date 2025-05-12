@@ -16,7 +16,13 @@ class SignupApi(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
-        return Response({'detail': 'Account created successfully'}, status=status.HTTP_201_CREATED)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response({
+            'detail': 'Account created successfully',
+            'account': {'email': serializer.instance.email}
+        }, status=status.HTTP_201_CREATED)
 
 @extend_schema(tags=["Account"])
 class UpdateAccountView(APIView):
