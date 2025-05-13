@@ -35,8 +35,9 @@ class ProductSerializer(serializers.ModelSerializer):
     specification = serializers.SerializerMethodField()
 
     def get_specification(self, obj):
-        specifications = obj.specifications.all()
-        return SpecificationSerializer(specifications, many=True).data
+        if obj.product_specifications.exists():
+            specifications = obj.specifications.all()
+            return SpecificationSerializer(specifications, many=True).data
 
     def get_product_images(self, obj):
         images = obj.images.all()
@@ -48,9 +49,6 @@ class ProductSerializer(serializers.ModelSerializer):
                     'category', 'subcategory', 'sub_subcategory', 'stock', 'size', 'visibility', 
                     'warranty', 'slug', 'product_images', 'specification'
                 ]
-
-from rest_framework import serializers
-from .models import Product, ProductImage, Specification, Category, SubCategory, Sub_SubCategory
 
 class CreateProductSerializer(serializers.ModelSerializer):
     images = serializers.ListField(
