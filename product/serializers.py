@@ -51,7 +51,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class CreateProductSerializer(serializers.ModelSerializer):
     product_images = serializers.ListField(child=serializers.ImageField())
-    specification = serializers.DictField()
+    specification = serializers.DictField(required=False)
     category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
     subcategory = serializers.PrimaryKeyRelatedField(queryset=SubCategory.objects.all())
     sub_subcategory = serializers.PrimaryKeyRelatedField(queryset=SubCategory.objects.all())
