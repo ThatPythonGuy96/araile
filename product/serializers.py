@@ -49,6 +49,9 @@ class ProductSerializer(serializers.ModelSerializer):
                     'warranty', 'slug', 'product_images', 'specification'
                 ]
 
+from rest_framework import serializers
+from .models import Product, ProductImage, Specification, Category, SubCategory, Sub_SubCategory
+
 class CreateProductSerializer(serializers.ModelSerializer):
     images = serializers.ListField(
         child=serializers.ImageField(), 
@@ -63,18 +66,22 @@ class CreateProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            'name', 'description', 'price', 'brand', 'color', 'sku', 'category', 'subcategory', 'sub_subcategory',
-            'stock', 'size', 'visibility', 'warranty', 'images', 'specifications'
+            'name', 'description', 'price', 'brand', 'color', 'sku',
+            'category', 'subcategory', 'sub_subcategory',
+            'stock', 'size', 'visibility', 'warranty',
+            'images', 'specifications'
         ]
 
     def create(self, validated_data):
+        # Extract nested fields
         images = validated_data.pop('images', [])
         specifications = validated_data.pop('specifications', {})
-        print(specifications)
+
         category_id = validated_data.pop('category')
         subcategory_id = validated_data.pop('subcategory')
         sub_subcategory_id = validated_data.pop('sub_subcategory')
 
+        # Retrieve related model instances
         try:
             category = Category.objects.get(pk=category_id)
         except Category.DoesNotExist:
@@ -90,6 +97,7 @@ class CreateProductSerializer(serializers.ModelSerializer):
         except Sub_SubCategory.DoesNotExist:
             raise serializers.ValidationError({'sub_subcategory': 'Invalid sub-subcategory ID.'})
 
+        # Create the product
         product = Product.objects.create(
             category=category,
             subcategory=subcategory,
@@ -97,9 +105,11 @@ class CreateProductSerializer(serializers.ModelSerializer):
             **validated_data
         )
 
+        # Save images
         for image in images:
             ProductImage.objects.create(product=product, image=image)
 
+        # Save specifications (key-value pairs)
         for key, value in specifications.items():
             Specification.objects.create(product=product, key=key, value=value)
 
