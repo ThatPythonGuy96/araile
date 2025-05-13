@@ -92,18 +92,17 @@ WSGI_APPLICATION = 'araile.wsgi.application'
 print("DEBUG:", DEBUG)
 print("Not DEBUG:", not DEBUG)
 # New commit
-if not DEBUG:
-    external = "postgresql://postgres:hIGDdcgzpMMlGqBrnImSXdqNnwJlvhjh@shuttle.proxy.rlwy.net:43743/railway"
-    DATABASES = {
-        'default': dj_database_url.parse(external)
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
+external = "postgresql://postgres:hIGDdcgzpMMlGqBrnImSXdqNnwJlvhjh@shuttle.proxy.rlwy.net:43743/railway"
+DATABASES = {
+    'default': dj_database_url.parse(external)
+}
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
 
 
 # Password validation
