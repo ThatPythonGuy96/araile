@@ -8,6 +8,7 @@ python manage.py collectstatic --no-input
 
 python manage.py makemigrations account
 python manage.py makemigrations product
+python manage.py makemigrations order
 python manage.py migrate
 
 # Create superuser
