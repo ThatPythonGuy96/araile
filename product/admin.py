@@ -1,10 +1,15 @@
 from django.contrib import admin
 from .models import *
 
-class imageInline(admin.TabularInline):
+class ImageInline(admin.TabularInline):
     model = ProductImage
-    extra = 3
+    extra = 2
     fields = ['image']
+
+class SpecificationInline(admin.TabularInline):
+    model = Specification
+    extra = 1
+    fields = ['key', 'value']
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -38,14 +43,14 @@ class Sub_SubCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'price', 'brand', 'color', 'sku', 'category', 'subcategory', 'sub_subcategory', 'stock', 'size', 'visibility', 'warranty', 'slug')
+    list_display = ('id', 'name', 'description', 'price', 'brand', 'color', 'sku', 'category', 'subcategory', 'sub_subcategory', 'stock', 'size', 'visibility', 'warranty', 'slug')
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ('name',)
     list_filter = ('category', 'subcategory', 'sub_subcategory')
     ordering = ('name',)
     list_per_page = 10
     list_editable = ('description', 'price', 'brand', 'color', 'sku', 'stock', 'size', 'visibility')
-    inlines = [imageInline]
+    inlines = [ImageInline, SpecificationInline]
 
 @admin.register(ProductImage)
 class ProductImageAdmin(admin.ModelAdmin):

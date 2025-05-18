@@ -24,8 +24,18 @@ class SubSubCategorySerializer(serializers.ModelSerializer):
 class SpecificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Specification
-        fields = ['id', 'product', 'key', 'value']
+        fields = ['key', 'value']
 
+    def create(self, validated_data):
+        key = validated_data.get('key')
+        value = validated_data.get('value')
+
+        specification = Specification.objects.create(
+            key=key,
+            value=value
+        )
+        return specification
+    
 class ProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     subcategory = SubCategorySerializer(read_only=True)
@@ -35,8 +45,8 @@ class ProductSerializer(serializers.ModelSerializer):
     specification = serializers.SerializerMethodField()
 
     def get_specification(self, obj):
-        if obj.product_specifications.exists():
-            specifications = obj.specifications.all()
+        if obj.product_specifications:
+            specifications = obj.product_specifications.all()
             return SpecificationSerializer(specifications, many=True).data
 
     def get_product_images(self, obj):
@@ -51,35 +61,37 @@ class ProductSerializer(serializers.ModelSerializer):
                 ]
 
 class CreateProductSerializer(serializers.ModelSerializer):
-    images = serializers.ListField(
-        child=serializers.ImageField(), 
-        write_only=True,
-        required=True
-    )
-    specifications = serializers.DictField(write_only=True, required=False)
+    name = serializers.CharField()
+    description = serializers.CharField()
+    price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    brand = serializers.CharField()
     category = serializers.IntegerField(write_only=True)
     subcategory = serializers.IntegerField(write_only=True)
     sub_subcategory = serializers.IntegerField(write_only=True)
-
+    color = serializers.CharField()
+    sku = serializers.CharField()
+    stock = serializers.IntegerField() 
+    size = serializers.IntegerField()
+    visibility = serializers.BooleanField()
+    warranty = serializers.IntegerField()
+    images = serializers.ListField(child=serializers.ImageField(), write_only=True)
+    specifications = SpecificationSerializer(many=True, required=False, write_only=True)
+    # specifications = serializers.DictField()
+    
     class Meta:
         model = Product
-        fields = [
-            'name', 'description', 'price', 'brand', 'color', 'sku',
-            'category', 'subcategory', 'sub_subcategory',
-            'stock', 'size', 'visibility', 'warranty',
-            'images', 'specifications'
-        ]
+        fields = (
+            'name', 'description', 'price', 'brand', 'color', 'sku', 'category', 'subcategory', 'sub_subcategory',
+            'stock', 'size', 'visibility', 'warranty', 'images', 'specifications'
+        )
 
     def create(self, validated_data):
-        # Extract nested fields
         images = validated_data.pop('images', [])
-        specifications = validated_data.pop('specifications', {})
-
+        spec_data = validated_data.pop('specifications', [])
         category_id = validated_data.pop('category')
         subcategory_id = validated_data.pop('subcategory')
         sub_subcategory_id = validated_data.pop('sub_subcategory')
 
-        # Retrieve related model instances
         try:
             category = Category.objects.get(pk=category_id)
         except Category.DoesNotExist:
@@ -95,7 +107,6 @@ class CreateProductSerializer(serializers.ModelSerializer):
         except Sub_SubCategory.DoesNotExist:
             raise serializers.ValidationError({'sub_subcategory': 'Invalid sub-subcategory ID.'})
 
-        # Create the product
         product = Product.objects.create(
             category=category,
             subcategory=subcategory,
@@ -103,12 +114,11 @@ class CreateProductSerializer(serializers.ModelSerializer):
             **validated_data
         )
 
-        # Save images
         for image in images:
             ProductImage.objects.create(product=product, image=image)
 
-        # Save specifications (key-value pairs)
-        for key, value in specifications.items():
-            Specification.objects.create(product=product, key=key, value=value)
+        for spec in spec_data:
+            print(spec)
+            Specification.objects.create(product=product, **spec)
 
         return product

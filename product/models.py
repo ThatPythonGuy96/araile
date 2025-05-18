@@ -80,7 +80,7 @@ class ProductImage(models.Model):
         return ''
     
 class Specification(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_specifications')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='specifications')
     key = models.CharField(max_length=100)
     value = models.CharField(max_length=100)
 
