@@ -17,10 +17,14 @@ def generate_order_id():
         number = 1
     return f"ORD{number:05d}"
 
+class OrderItem(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="order_product")
+    # quantity = models.
+
 class Order(models.Model):
     order_id = models.CharField(max_length=10, primary_key=True, default=generate_order_id, editable=False)
-    customer = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="customer_order")
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="order_product")
+    customer = models.OneToOneField(Account, on_delete=models.CASCADE, related_name="customer_order")
+    products = models.ManyToManyField(OrderItem, related_name='order_items')
     status = models.CharField(max_length=40, choices=STATUS, default="Pending")
     total = models.DecimalField(max_digits=9, decimal_places=2)
     order_date = models.DateField(auto_now_add=True)

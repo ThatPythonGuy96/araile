@@ -9,7 +9,7 @@ class ImageInline(admin.TabularInline):
 class SpecificationInline(admin.TabularInline):
     model = Specification
     extra = 1
-    fields = ['key', 'value']
+    fields = ['specification', 'type', 'value']
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -62,7 +62,7 @@ class ProductImageAdmin(admin.ModelAdmin):
 
 @admin.register(Specification)
 class SpecificationAdmin(admin.ModelAdmin):
-    list_display = ('product', 'key')
+    list_display = ('product', 'specification')
     search_fields = ('product__name',)
     list_filter = ('product',)
     ordering = ('product',)

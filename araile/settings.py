@@ -14,9 +14,9 @@ from pathlib import Path
 from datetime import timedelta
 import os
 from dotenv import load_dotenv
+import dj_database_url
 
 load_dotenv()
-import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -92,7 +92,7 @@ WSGI_APPLICATION = 'araile.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 print("DEBUG:", DEBUG)
 # New commit
-external = "postgresql://postgres:hIGDdcgzpMMlGqBrnImSXdqNnwJlvhjh@shuttle.proxy.rlwy.net:43743/railway"
+external = os.environ.get('POSTGRES')
 DATABASES = {
     'default': dj_database_url.parse(external)
 }

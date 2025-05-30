@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.validators import FileExtensionValidator
+from django.utils.safestring import mark_safe
+import os
 
 class Category(models.Model):
     category = models.CharField(max_length=20)
@@ -64,8 +66,10 @@ class Product(models.Model):
         super(Product, self).save(*args, **kwargs)
 
 def get_product_image_path(instance, filename):
-    # Generate a unique filename using the product's slug and the original filename
-    return f'products/{instance.product.slug}/{filename}'
+    upload_to = '{}/{}'.format('product', instance.product.slug)
+    ext = filename.split('.')[-1]
+    filename = '{}.{}'.format(instance.product.slug, ext)
+    return os.path.join(upload_to, filename)
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
@@ -75,14 +79,13 @@ class ProductImage(models.Model):
         return f"Image for {self.product.name}"
 
     def image_tag(self):
-        if self.image:
-            return f'<img src="{self.image.url}" width="50" height="50" />'
-        return ''
+        return mark_safe('<img src="/../../media/%s" width="100" height="100" />' % (self.image))
     
 class Specification(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='specifications')
-    key = models.CharField(max_length=100)
+    specification = models.CharField(max_length=100)
+    type = models.CharField(max_length=100)
     value = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"{self.key}: {self.value} for {self.product.name}"
+        return f"{self.specification}: {self.value} for {self.product.name}"
