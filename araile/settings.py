@@ -92,10 +92,11 @@ WSGI_APPLICATION = 'araile.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 print("DEBUG:", DEBUG)
 # New commit
-# external = os.environ.get('POSTGRES')
-# DATABASES = {
-#     'default': dj_database_url.parse(external)
-# }
+if os.environ.get('DEBUG') == False:
+    external = os.environ.get('POSTGRES')
+    DATABASES = {
+        'default': dj_database_url.parse(external)
+    }
 
 DATABASES = {
     'default': {
@@ -144,13 +145,6 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-
-# STORAGES = {
-#     "staticfiles": {
-#         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-#     },
-# }
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
