@@ -7,16 +7,21 @@ class ProductImageSerializer(serializers.ModelSerializer):
         fields = ['id', 'image', 'product']
 
 class CategorySerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Category
         fields = ['id', 'category', 'slug']
 
 class SubCategorySerializer(serializers.ModelSerializer):
+    category = CategorySerializer()
+
     class Meta:
         model = SubCategory
         fields = ['id', 'subcategory', 'category', 'slug']    
 
 class SubSubCategorySerializer(serializers.ModelSerializer):
+    subcategory = SubCategorySerializer()
+
     class Meta:
         model = Sub_SubCategory
         fields = ['id', 'sub_subcategory', 'subcategory', 'slug']
@@ -56,9 +61,9 @@ class CreateProductSerializer(serializers.ModelSerializer):
     description = serializers.CharField()
     price = serializers.DecimalField(max_digits=10, decimal_places=2)
     brand = serializers.CharField()
-    category = serializers.IntegerField(write_only=True)
-    subcategory = serializers.IntegerField(write_only=True)
-    sub_subcategory = serializers.IntegerField(write_only=True)
+    category = serializers.CharField(write_only=True)
+    subcategory = serializers.CharField(write_only=True)
+    sub_subcategory = serializers.CharField(write_only=True)
     color = serializers.CharField()
     sku = serializers.CharField()
     stock = serializers.IntegerField() 
@@ -67,8 +72,6 @@ class CreateProductSerializer(serializers.ModelSerializer):
     warranty = serializers.IntegerField()
     images = serializers.ListField(child=serializers.ImageField(), write_only=True)
     specifications = SpecificationSerializer(write_only=True, many=True)
-    # specification_type = serializers.CharField()
-    # specification_value = serializers.CharField()
     
     class Meta:
         model = Product
@@ -79,24 +82,15 @@ class CreateProductSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         images = validated_data.pop('images', [])
+        specs = validated_data.pop('specifications', [])
+        print(specs)
         category_id = validated_data.pop('category')
         subcategory_id = validated_data.pop('subcategory')
         sub_subcategory_id = validated_data.pop('sub_subcategory')
 
-        try:
-            category = Category.objects.get_or_create(id=category_id)
-        except Category.DoesNotExist:
-            raise serializers.ValidationError({'category': 'Invalid category ID.'})
-        
-        try:
-            subcategory = SubCategory.objects.get_or_create(id=subcategory_id, category=category)
-        except SubCategory.DoesNotExist:
-            raise serializers.ValidationError({'subcategory': 'Invalid subcategory ID.'})
-        
-        try:
-            sub_subcategory = Sub_SubCategory.objects.get_or_create(id=sub_subcategory_id, subcategory=subcategory)
-        except Sub_SubCategory.DoesNotExist:
-            raise serializers.ValidationError({'sub_subcategory': 'Invalid sub-subcategory ID.'})
+        category, _ = Category.objects.get_or_create(category=category_id)
+        subcategory, _ = SubCategory.objects.get_or_create(subcategory=subcategory_id, category=category)
+        sub_subcategory, _ = Sub_SubCategory.objects.get_or_create(sub_subcategory=sub_subcategory_id, subcategory=subcategory)
 
         product = Product.objects.create(
             category=category,
@@ -108,12 +102,8 @@ class CreateProductSerializer(serializers.ModelSerializer):
         for image in images:
             ProductImage.objects.create(product=product, image=image)
 
-        Specification.objects.create(
-            product=product,
-            specification=validated_data['specification'],
-            type=validated_data['specification_type'],
-            value=validated_data['specification_value']
-        )
+        for spec in specs:
+            Specification.objects.create(product=product, **spec)
 
         return product
     

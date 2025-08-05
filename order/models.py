@@ -17,17 +17,13 @@ def generate_order_id():
         number = 1
     return f"ORD{number:05d}"
 
-class OrderItem(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="order_product")
-    # quantity = models.
-
 class Order(models.Model):
     order_id = models.CharField(max_length=10, primary_key=True, default=generate_order_id, editable=False)
     customer = models.OneToOneField(Account, on_delete=models.CASCADE, related_name="customer_order")
-    products = models.ManyToManyField(OrderItem, related_name='order_items')
     status = models.CharField(max_length=40, choices=STATUS, default="Pending")
-    total = models.DecimalField(max_digits=9, decimal_places=2)
+    paid = models.BooleanField(default=False)
     order_date = models.DateField(auto_now_add=True)
+    updated = models.DateField(auto_now=True)
 
     def save(self, *args, **kwargs):
     #     if not self.order_id:
@@ -38,6 +34,9 @@ class Order(models.Model):
     #             except IntegrityError:
     #                 time.sleep(0.1)
     #         raise IntegrityError("Failed to generate unique order ID after multiple attempts.")
-        price = self.product.price
-        self.total = price
         return super().save(*args, **kwargs)
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="order_product")
+    quantity = models.IntegerField()

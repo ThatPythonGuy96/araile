@@ -7,6 +7,5 @@ class OrdeItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('order_id', 'customer', 'status', 'total')
-    readonly_fields = ['total',]
-    # inlines = [OrdeItemInline]
+    list_display = ('order_id', 'customer', 'status')
+    inlines = [OrdeItemInline]

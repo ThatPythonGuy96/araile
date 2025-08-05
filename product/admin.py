@@ -13,7 +13,7 @@ class SpecificationInline(admin.TabularInline):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('category', 'slug')
+    list_display = ('category', 'id', 'slug')
     prepopulated_fields = {'slug': ('category',)}
     search_fields = ('category',)
     list_filter = ('category',)
@@ -23,7 +23,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(SubCategory)
 class SubCategoryAdmin(admin.ModelAdmin):
-    list_display = ('subcategory', 'category', 'slug')
+    list_display = ('subcategory', 'id', 'category', 'slug')
     prepopulated_fields = {'slug': ('subcategory',)}
     search_fields = ('subcategory',)
     list_filter = ('subcategory',)
@@ -33,7 +33,7 @@ class SubCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Sub_SubCategory)
 class Sub_SubCategoryAdmin(admin.ModelAdmin):
-    list_display = ('sub_subcategory', 'subcategory', 'slug')
+    list_display = ('sub_subcategory', 'id', 'subcategory', 'slug')
     prepopulated_fields = {'slug': ('sub_subcategory',)}
     search_fields = ('sub_subcategory',)
     list_filter = ('sub_subcategory',)
