@@ -1,8 +1,8 @@
 db.sqlite3
-proj_env/
+araile_env/
 migrations/
 migrations
 media/
 .env
-# araile/settings.py
 __pycache__/
+database.py

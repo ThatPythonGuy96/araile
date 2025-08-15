@@ -5,11 +5,11 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from drf_spectacular.utils import extend_schema
 from rest_framework.views import APIView
 
-@extend_schema(tags=["Account"])
+@extend_schema(tags=["Account"], description='Login into an Account.')
 class LoginView(TokenObtainPairView):
     serializer_class = serializers.LoginTokenSerializer
 
-@extend_schema(tags=["Account"])
+@extend_schema(tags=["Account"], description='Create an Account.')
 class SignupApi(generics.CreateAPIView):
     serializer_class = serializers.SignupSerializer
     queryset = models.Account.objects.all()
@@ -24,7 +24,7 @@ class SignupApi(generics.CreateAPIView):
             'account': {'email': serializer.instance.email}
         }, status=status.HTTP_201_CREATED)
 
-@extend_schema(tags=["Account"])
+@extend_schema(tags=["Account"], description='Update an Account.')
 class UpdateAccountView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = serializers.UpdateAccountSerializer
@@ -46,7 +46,7 @@ class UpdateAccountView(APIView):
         except Exception as e:
             return Response({"error:", str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
-@extend_schema(tags=["Account"])
+@extend_schema(tags=["Account"], description='Change account password.')
 class ChangePasswordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = serializers.ChangePasswordSerializer
