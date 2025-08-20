@@ -30,7 +30,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = ['araile.onrender.com', '*']
+ALLOWED_HOSTS = ['araile.onrender.com', '127.0.0.1']
 
 AUTH_USER_MODEL = 'account.Account'
 
@@ -59,6 +59,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -90,27 +91,26 @@ WSGI_APPLICATION = 'araile.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 print("DEBUG:", DEBUG)
-# New commit
-if DEBUG == False:
-    print('Using Postgres')
-    DATABASES = {
-        'default': {
-            'ENGINE': os.environ.get('DATABASE_ENGINE', 'django.db.backends.sqlite3'),
-            'NAME': os.environ.get('DATABASE_NAME', os.path.join(BASE_DIR, 'db.sqlite3')),
-            'USER': os.environ.get('DATABASE_USER', None),
-            'PASSWORD': os.environ.get('DATABASE_PASSWORD', None),
-            'HOST': os.environ.get('DATABASE_HOST', None),
-            'PORT': os.environ.get('DATABASE_PORT', None),
-            'ATOMIC_REQUESTS': True
-        }
+print('Using Postgres')
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('name'),
+        'USER': os.environ.get('user'),
+        'PASSWORD': os.environ.get('password') ,
+        'HOST': os.environ.get('host'),
+        'PORT':  os.environ.get('port'),
+        'DBNAME': os.environ.get('dbname')
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
+}
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
 
 
 # Password validation
@@ -149,9 +149,26 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_URL = "https://zzyhggzluoonnozgyyop.storage.supabase.co/storage/v1/s3/araile_media"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "access_key": os.environ.get('accessKey'),
+            "secret_key": os.environ.get('secretKey'),
+            "bucket_name": os.environ.get('bucketName'),
+            "region_name": 'eu-west-2',
+            "endpoint_url": os.environ.get('endpointUrl'),
+        },
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

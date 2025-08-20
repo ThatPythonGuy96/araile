@@ -5,4 +5,4 @@ migrations
 media/
 .env
 __pycache__/
-database.py
+staticfiles
