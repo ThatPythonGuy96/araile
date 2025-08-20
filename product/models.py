@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import FileExtensionValidator
 from django.utils.safestring import mark_safe
 import os
+import uuid
 
 class Category(models.Model):
     category = models.CharField(max_length=20)
@@ -66,9 +67,13 @@ class Product(models.Model):
         super(Product, self).save(*args, **kwargs)
 
 def get_product_image_path(instance, filename):
-    upload_to = '{}/{}'.format('product', instance.product.slug)
+    upload_to = f'product/{instance.product.slug}'
     ext = filename.split('.')[-1]
-    filename = '{}.{}'.format(instance.product.slug, ext)
+    # Use the original filename (without extension) and add a unique suffix
+    base = os.path.splitext(filename)[0]
+    # Add the image id if available, otherwise use a random string
+    unique_suffix = str(uuid.uuid4())
+    filename = f"{instance.product.slug}-{unique_suffix}.{ext}"
     return os.path.join(upload_to, filename)
 
 class ProductImage(models.Model):

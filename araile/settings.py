@@ -149,7 +149,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATIC_URL = "https://zzyhggzluoonnozgyyop.storage.supabase.co/storage/v1/s3/araile_media"
+# STATIC_URL = "https://zzyhggzluoonnozgyyop.storage.supabase.co/storage/v1/s3/araile_media"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
