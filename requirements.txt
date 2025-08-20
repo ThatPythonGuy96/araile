@@ -18,8 +18,8 @@ django-storages==1.14.6
 drf-standardized-errors==0.15.0
 filelock==3.16.1
 gunicorn==23.0.0
-hyperlink==21.0.0
-idna==3.10
+hyperlink
+idna
 incremental==24.7.2
 inflection==0.5.1
 jsonschema==4.23.0
